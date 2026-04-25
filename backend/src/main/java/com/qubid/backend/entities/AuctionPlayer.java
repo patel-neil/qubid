@@ -1,11 +1,13 @@
 package com.qubid.backend.entities;
 
+import com.qubid.backend.enums.AuctionPlayerStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,22 +17,30 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuctionPlayer extends BaseEntity{
+public class AuctionPlayer extends BaseEntity {
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "player_id")
     private Player player;
 
     @OneToOne
+    @JoinColumn(name = "base_price_id")
     private BasePrice basePrice;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "auction_auctionPlayer",
-            joinColumns = @JoinColumn(name = "auctionPlayer_id"),
-            inverseJoinColumns = @JoinColumn(name = "auction_id")
-    )
-    private List<Auction> auctionList = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_id")   // plain @JoinColumn, NOT @JoinTable
+    private Auction auction;
 
-    @OneToMany(mappedBy = "auctionPlayer")
-    private List<Bid> bidList = new ArrayList<>();
+    @OneToMany(mappedBy = "auctionPlayer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bid> bids = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AuctionPlayerStatus status = AuctionPlayerStatus.PENDING;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sold_to_franchise_id")
+    private Franchise soldToFranchise;
+
+    private BigDecimal finalSoldPrice;
 }

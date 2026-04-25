@@ -18,7 +18,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tournament extends  BaseEntity {
+public class Tournament extends BaseEntity {
 
     private String name;
 
@@ -30,14 +30,14 @@ public class Tournament extends  BaseEntity {
 
     private BigDecimal allotedPurse;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "tournaments")
+    private List<Franchise> franchises = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Team> teams = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "tournaments")
     private List<Player> players = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "tournament" )
-    List<Franchise> franchiseList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "tournament")
-    private List<Team> teamList = new ArrayList<>();
 
 
 }
